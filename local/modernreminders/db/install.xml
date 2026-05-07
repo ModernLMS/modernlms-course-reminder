@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="local/modernreminders/db" VERSION="2026050700" COMMENT="XMLDB file for local_modernreminders"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
+>
+  <TABLES>
+    <TABLE NAME="local_modernreminders" COMMENT="Stores course-level reminder configuration.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Foreign key to course.id"/>
+        <FIELD NAME="enabled" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Whether reminders are enabled for this course"/>
+        <FIELD NAME="reminderdays" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="7" SEQUENCE="false" COMMENT="Number of days after enrolment before sending reminder"/>
+        <FIELD NAME="emailsubject" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Email subject line template"/>
+        <FIELD NAME="emailtemplate" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Email body template with placeholders"/>
+        <FIELD NAME="emailtemplateformat" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="Format of the email template"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="usermodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="User who last modified the settings"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="courseid_fk" TYPE="foreign-unique" FIELDS="courseid" REFTABLE="course" REFFIELDS="id" COMMENT="One config row per course"/>
+        <KEY NAME="usermodified_fk" TYPE="foreign" FIELDS="usermodified" REFTABLE="user" REFFIELDS="id"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="local_modernreminders_log" COMMENT="Log of reminder emails sent to prevent duplicates.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Foreign key to course.id"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Foreign key to user.id"/>
+        <FIELD NAME="enrolmenttime" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Timestamp of user enrolment"/>
+        <FIELD NAME="remindersenttime" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Timestamp when reminder was sent"/>
+        <FIELD NAME="status" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="sent" SEQUENCE="false" COMMENT="Status: sent or failed"/>
+        <FIELD NAME="errormessage" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Error message if sending failed"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="courseid_fk" TYPE="foreign" FIELDS="courseid" REFTABLE="course" REFFIELDS="id"/>
+        <KEY NAME="userid_fk" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="courseid_userid_idx" UNIQUE="false" FIELDS="courseid, userid" COMMENT="Lookup index for duplicate checking"/>
+      </INDEXES>
+    </TABLE>
+  </TABLES>
+</XMLDB>
