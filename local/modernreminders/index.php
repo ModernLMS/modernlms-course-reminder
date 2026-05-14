@@ -58,6 +58,7 @@ $formdata->id = $courseid;
 if ($settings) {
     $formdata->enabled = $settings->enabled;
     $formdata->reminderdays = $settings->reminderdays;
+    $formdata->emailfrequency = $settings->emailfrequency ?? 'daily';
     $formdata->emailsubject = $settings->emailsubject;
     $formdata->emailtemplate = $settings->emailtemplate;
 }
@@ -116,6 +117,11 @@ if ($canmanage) {
         $table->data[] = [
             get_string('reminderdays', 'local_modernreminders'),
             $settings->reminderdays . ' ' . get_string('reminderdays_unit', 'local_modernreminders'),
+        ];
+        $frequencykey = 'frequency_' . ($settings->emailfrequency ?? 'daily');
+        $table->data[] = [
+            get_string('emailfrequency', 'local_modernreminders'),
+            get_string($frequencykey, 'local_modernreminders'),
         ];
         $table->data[] = [
             get_string('emailsubject', 'local_modernreminders'),

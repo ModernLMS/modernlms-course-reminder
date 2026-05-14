@@ -115,15 +115,6 @@ class send_reminders extends \core\task\scheduled_task {
         $courseid = $course->id;
         $userid = $user->id;
 
-        // Check if reminder was already sent.
-        if (manager::is_reminder_sent($courseid, $userid)) {
-            mtrace('  ' . get_string('alreadysent', 'local_modernreminders', (object)[
-                'userid' => $userid,
-                'courseid' => $courseid,
-            ]));
-            return;
-        }
-
         // Get enrolment time.
         $enrolmenttime = manager::get_enrolment_time($courseid, $userid);
         if ($enrolmenttime <= 0) {
@@ -150,6 +141,24 @@ class send_reminders extends \core\task\scheduled_task {
                 'courseid' => $courseid,
             ]));
             return;
+        }
+
+        // Check if enough time has passed since the last reminder based on frequency.
+        $lastsenttime = manager::get_last_reminder_sent_time($courseid, $userid);
+        if ($lastsenttime > 0) {
+            $frequencyinterval = manager::get_frequency_interval($settings->emailfrequency ?? 'daily');
+            $nextreminder = $lastsenttime + $frequencyinterval;
+            if ($now < $nextreminder) {
+                $daysago = floor(($now - $lastsenttime) / DAYSECS);
+                $daysleft = ceil(($nextreminder - $now) / DAYSECS);
+                mtrace('  ' . get_string('remindertoosoon', 'local_modernreminders', (object)[
+                    'userid' => $userid,
+                    'courseid' => $courseid,
+                    'daysago' => $daysago,
+                    'daysleft' => $daysleft,
+                ]));
+                return;
+            }
         }
 
         // Send the reminder email.

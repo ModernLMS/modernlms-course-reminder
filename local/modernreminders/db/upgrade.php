@@ -33,7 +33,16 @@ function xmldb_local_modernreminders_upgrade($oldversion) {
 
     $dbman = $DB->get_manager();
 
-    // Future upgrade steps go here.
+    if ($oldversion < 2026051400) {
+        $table = new xmldb_table('local_modernreminders');
+        $field = new xmldb_field('emailfrequency', XMLDB_TYPE_CHAR, '10', null, XMLDB_NOTNULL, null, 'daily', 'reminderdays');
+
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_plugin_savepoint(true, 2026051400, 'local', 'modernreminders');
+    }
 
     return true;
 }

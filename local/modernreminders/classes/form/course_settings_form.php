@@ -55,6 +55,17 @@ class course_settings_form extends \moodleform {
         $mform->setDefault('reminderdays', 7);
         $mform->disabledIf('reminderdays', 'enabled', 'notchecked');
 
+        // Email Frequency.
+        $frequencyoptions = [
+            'daily' => get_string('frequency_daily', 'local_modernreminders'),
+            'weekly' => get_string('frequency_weekly', 'local_modernreminders'),
+            'monthly' => get_string('frequency_monthly', 'local_modernreminders'),
+        ];
+        $mform->addElement('select', 'emailfrequency', get_string('emailfrequency', 'local_modernreminders'), $frequencyoptions);
+        $mform->addHelpButton('emailfrequency', 'emailfrequency', 'local_modernreminders');
+        $mform->setDefault('emailfrequency', 'daily');
+        $mform->disabledIf('emailfrequency', 'enabled', 'notchecked');
+
         // Email Subject.
         $mform->addElement('text', 'emailsubject', get_string('emailsubject', 'local_modernreminders'), ['size' => 80]);
         $mform->addHelpButton('emailsubject', 'emailsubject', 'local_modernreminders');

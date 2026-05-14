@@ -9,7 +9,8 @@
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Foreign key to course.id"/>
         <FIELD NAME="enabled" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Whether reminders are enabled for this course"/>
-        <FIELD NAME="reminderdays" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="7" SEQUENCE="false" COMMENT="Number of days after enrolment before sending reminder"/>
+        <FIELD NAME="reminderdays" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="7" SEQUENCE="false" COMMENT="Number of days after enrolment by which the user should complete the course"/>
+        <FIELD NAME="emailfrequency" TYPE="char" LENGTH="10" NOTNULL="true" DEFAULT="daily" SEQUENCE="false" COMMENT="How often to repeat reminders: daily, weekly, monthly"/>
         <FIELD NAME="emailsubject" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Email subject line template"/>
         <FIELD NAME="emailtemplate" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Email body template with placeholders"/>
         <FIELD NAME="emailtemplateformat" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="Format of the email template"/>

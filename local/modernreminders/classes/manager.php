@@ -52,6 +52,7 @@ class manager {
         $record->courseid = $data->id;
         $record->enabled = !empty($data->enabled) ? 1 : 0;
         $record->reminderdays = (int)($data->reminderdays ?? 7);
+        $record->emailfrequency = $data->emailfrequency ?? 'daily';
         $record->emailsubject = $data->emailsubject ?? get_string('defaultsubject', 'local_modernreminders');
         $record->emailtemplate = $data->emailtemplate ?? get_string('defaulttemplate', 'local_modernreminders');
         $record->emailtemplateformat = FORMAT_PLAIN;
@@ -79,19 +80,46 @@ class manager {
     }
 
     /**
-     * Check if a reminder has already been sent to a user for a specific course enrolment.
+     * Get the timestamp of the last successfully sent reminder for a user in a course.
      *
      * @param int $courseid The course ID.
      * @param int $userid The user ID.
-     * @return bool True if already sent.
+     * @return int The timestamp of the last sent reminder, or 0 if never sent.
      */
-    public static function is_reminder_sent(int $courseid, int $userid): bool {
+    public static function get_last_reminder_sent_time(int $courseid, int $userid): int {
         global $DB;
-        return $DB->record_exists('local_modernreminders_log', [
+
+        $sql = "SELECT MAX(remindersenttime) AS lastsenttime
+                  FROM {local_modernreminders_log}
+                 WHERE courseid = :courseid
+                   AND userid = :userid
+                   AND status = :status";
+
+        $result = $DB->get_record_sql($sql, [
             'courseid' => $courseid,
             'userid' => $userid,
             'status' => 'sent',
         ]);
+
+        return ($result && $result->lastsenttime) ? (int)$result->lastsenttime : 0;
+    }
+
+    /**
+     * Get the interval in seconds for a given email frequency.
+     *
+     * @param string $frequency The frequency: 'daily', 'weekly', or 'monthly'.
+     * @return int The interval in seconds.
+     */
+    public static function get_frequency_interval(string $frequency): int {
+        switch ($frequency) {
+            case 'weekly':
+                return 7 * DAYSECS;
+            case 'monthly':
+                return 30 * DAYSECS;
+            case 'daily':
+            default:
+                return DAYSECS;
+        }
     }
 
     /**
